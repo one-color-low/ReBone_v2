@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>V studio</title>
+</head>
+
+<body>
+
+    <form id="movie_upload">
+        <p>動画ファイルをアップロード</p>
+        <p><input type="file" name="movie"></p>
+        <br>
+        <button type="button" onclick="file_upload()" >アップロード</button>
+    </form>
+
+    <script>
+        function file_upload() {
+            // フォームデータを取得
+            var formdata = new FormData(document.getElementById("movie_upload"));
+
+            // XMLHttpRequestによるアップロード処理
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    alert(xhr.responseText);
+                }
+            };
+            xhr.open("POST", "/makevmd", true);
+            xhr.send(formdata);
+        }
+
+    </script>
+
+</body>
+
+</html>

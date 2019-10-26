@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>V studio</title>
+</head>
+
+<body>
+
+    <form method="POST">
+        <p>BGMを選択</p>
+        <select name="sound">
+            <option value="edm_1">EDM その１</option>
+            <option value="edm_2">EDM その２</option>
+            <option value="urban">都会っぽく</option>
+            <option value="green">草原っぽく</option>
+        </select>
+        <br>
+        <p>VMDファイルを選択</p>
+        <select name="vmd">
+            <option value="wait">待機</option>
+            <option value="bleath">呼吸</option>
+            <option value="wavefile">ダンス(wavefile)</option>
+        </select>
+        <br>
+        <p><input type="submit" name="save" value="送信" /></p>
+    </form>
+
+    <video id="video" width="640" height="480" autoplay></video>
+    <video id="result_video" width="640" height="480" autoplay></video>
+    <button id="record_btn">Record</button>
+    <div id="result"></div>
+
+    <script>
+
+        var video = document.getElementById("video")
+        var result_video = document.getElementById("result_video")
+        var record_btn = document.getElementById("record_btn")
+        var media = navigator.mediaDevices.getUserMedia({
+            video: { width: 128, height: 72 },
+            audio: true,
+        })
+
+
+        //リアルタイムに再生（ストリーミング）させるためにビデオタグに流し込む
+        media.then((stream) => {
+
+            video.srcObject = stream;
+
+            var options = {
+                videoBitsPerSecond: 512000, // 512kbits / sec
+                mimeType: 'video/webm; codecs=vp9'
+            }
+
+            // さらにstreamをwebmで保存
+            recorder = new MediaRecorder(stream, options)
+
+            var chunks = []
+            recorder.addEventListener('dataavailable', (e) => {
+                chunks.push(e.data);
+            })
+
+            record_btn.onclick = function () {
+                recorder.start()
+                record_btn.disabled = true
+
+                setTimeout("recorder.stop()", 3000)
+
+            }
+
+            recorder.onstop = function (e) {
+                var video_blob = new Blob(chunks, { type: 'video/webm' })
+
+                result_video.src = window.URL.createObjectURL(video_blob)
+                result_video.play()
+
+                var formData = new FormData()
+                formData.append('video_blob', video_blob, 'video.webm')
+
+                // Ajaxでblobを送信
+                var xhr = new XMLHttpRequest()
+                xhr.open('POST', '/makevmd?room_name='+'{{ room_name }}')
+                xhr.send(formData)
+
+            }
+        });
+
+
+    </script>
+
+</body>
+
+</html>

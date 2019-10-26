@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>3DWeb Base</title>
+	<meta charset="utf-8">
+</head>
+
+<body>
+	<script src="../static/js/build/three.min.js"></script>
+	<script src="../static/js/libs/charsetencoder.min.js"></script>
+	<script src="../static/js/libs/ammo.js"></script>
+	<script src="../static/js/loaders/TGALoader.js"></script>
+	<script src="../static/js/loaders/MMDLoader.js"></script>
+	<script src="../static/js/animation/CCDIKSolver.js"></script>
+	<script src="../static/js/animation/MMDPhysics.js"></script>
+
+	<script>
+		'use strict';
+
+		var container, stats;
+
+		var mesh = 1
+		var camera, scene, renderer;
+		var loader, helper;
+
+		var clip, action;
+
+		var state, stateBefore;
+
+		var mouseX = 0, mouseY = 0;
+
+		var windowHalfX = window.innerWidth / 2;
+		var windowHalfY = window.innerHeight / 2;
+
+		var clock = new THREE.Clock();
+
+		/*if (window.File && window.FileReader && window.FileList && window.Blob) {
+			console.log("Great success! All the File APIs are supported.");
+		} else {
+			console.log('The File APIs are not fully supported in this browser.');
+		}*/
+		init();
+		animate();
+
+		function init() {
+
+			container = document.createElement('div');
+			document.body.appendChild(container);
+
+			camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+			camera.position.z = 100;
+			camera.position.x = -100;
+			camera.position.y = 30;
+
+			// scene
+
+			scene = new THREE.Scene();
+
+			var ambient = new THREE.AmbientLight(0x888888);
+			scene.add(ambient);
+
+			var directionalLight = new THREE.DirectionalLight(0x666666);
+			directionalLight.position.set(-1, 1, 1).normalize();
+			scene.add(directionalLight);
+
+			// renderer
+
+			renderer = new THREE.WebGLRenderer({ antialias: true });
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.setClearColor(new THREE.Color(0xffffff));
+			container.appendChild(renderer.domElement);
+
+			// ground plane
+
+			var planeGeometry = new THREE.PlaneGeometry(600, 400);
+			var planeMaterial = new THREE.MeshBasicMaterial({ color: 0xcccccc });
+			var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+			plane.rotation.x = -0.5 * Math.PI;
+			plane.position.x = 0;
+			plane.position.y = 0;
+			plane.position.z = 0;
+
+			scene.add(plane);
+
+			// model
+
+			var modelFile = '../static/models/miku_v2.pmd';
+			//var modelFile = "http://localhost:8001/a1f0bfce-f754-4fed-b209-d9dec175f1f7";
+
+			//var vpdFile = 'vpds/01.vpd'
+
+			var vmdFiles = [
+				{ name: "1st", file: "../static/vmds/mutsu/2.走る/1.走り出し_(6f_前移動10).vmd" },
+				{ name: "2nd", file: "../static/vmds/mutsu/2.走る/2.走り40L_ジョギング_(20f_前移動40).vmd" },
+				//{ name: "2nd", file: "vmds/mutsu/2.走る/2.走り40L_ドタドタ走り_(20f_前移動40).vmd"},
+				//{ name: "3rd", file: "vmds/mutsu/2.走る/2.走り86L_ダッシュ加速_(14f_前移動60).vmd"},
+				{ name: "stop", file: "../static/vmds/mutsu/2.走る/4.止る_(11f_前移動5).vmd" },
+				{ name: "stay", file: "../static/vmds/mutsu/5.待機モーション・その他/待機モーション/1.ぼんやり待ち_(490f_移動なし).vmd" },
+			]
+
+			loadmmd(modelFile, vmdFiles);
+			// other
+
+			document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+			window.addEventListener('resize', onWindowResize, false);
+
+		}
+
+		function loadmmd(modelFile, vmdFiles) {
+			var onProgress = function (xhr) {
+			};
+			var onError = function (xhr) {
+				console.log('load mmd error');
+			};
+			var onLoad = function () {
+
+			};
+
+			helper = new THREE.MMDHelper(renderer);
+			loader = new THREE.MMDLoader();
+			// ↓ onload時のcallbackとして無名関数が入っている
+			loader.loadModel(modelFile, function (object) {
+				mesh = object;
+				scene.add(mesh);
+				helper.add(mesh);
+
+				if (vmdFiles && vmdFiles.length !== 0) {
+					var vmdIndex = 0;
+					var loadVmd = function () {
+						var vmdFile = vmdFiles[vmdIndex].file;
+						loader.loadVmd(vmdFile, function (vmd) {
+							loader.createAnimation(mesh, vmd, vmdFiles[vmdIndex].name);
+							vmdIndex++;
+							if (vmdIndex < vmdFiles.length) {	// まだ読み込むvmdがあったら
+								loadVmd();
+							} else {							// 読み込み終わったら
+								helper.setPhysics(mesh);
+								/*helper.setAnimation(mesh);
+								clip = mesh.geometry.animations[3];
+								action = mesh.mixer.clipAction(clip);
+								action.play();*/
+								console.log(mesh.geometry.animations)
+							}
+						}, onProgress, onError);
+					};
+					loadVmd();
+				}
+				// ここまではmeshあり
+			}, onProgress, onError);
+			// ここでmeshが消える
+		};
+
+
+		function onProgress(xhr) {
+			if (xhr.lengthComputable) {
+				var percentComplete = xhr.loaded / xhr.total * 100;
+				console.log(Math.round(percentComplete, 2) + '% downloaded');
+			}
+		};
+
+		function onError(xhr) {
+		};
+
+		function onWindowResize() {
+
+			windowHalfX = window.innerWidth / 2;
+			windowHalfY = window.innerHeight / 2;
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+		}
+
+		function onDocumentMouseMove(event) {
+
+			mouseX = (event.clientX - windowHalfX) / 2;
+			mouseY = (event.clientY - windowHalfY) / 2;
+
+		}
+
+		// animation
+
+		function animate() {
+
+			requestAnimationFrame(animate);
+			runAnimate();
+			render();
+
+		}
+
+		function runAnimate() {
+
+			//stateBefore = state;
+
+			// move
+			window.document.onkeydown = function (event) {
+				var runSpeed = 1.0
+				if (event.key === 'w') {
+					if (mesh.rotation.y != 1.0 * Math.PI) {
+						mesh.rotation.y = 1.0 * Math.PI
+					}
+					mesh.position.z -= runSpeed;
+					state = "running";
+				}
+				else if (event.key === 'a') {
+					if (mesh.rotation.y != 1.5 * Math.PI) {
+						mesh.rotation.y = 1.5 * Math.PI
+					}
+					mesh.position.x -= runSpeed;
+					state = "running";
+				}
+				else if (event.key === 's') {
+					if (mesh.rotation.y != 0.0 * Math.PI) {
+						mesh.rotation.y = 0.0 * Math.PI
+					}
+					mesh.position.z += runSpeed;
+					state = "running";
+				}
+				else if (event.key === 'd') {
+					if (mesh.rotation.y != 0.5 * Math.PI) {
+						mesh.rotation.y = 0.5 * Math.PI
+					}
+					mesh.position.x += runSpeed;
+					state = "running";
+				}
+			};
+
+			window.document.onkeyup = function () {
+				if (event.key === "w" || event.key === "a" || event.key === "s" || event.key === "d") {
+					state = "stop";
+				}
+			};
+
+			// motion change
+			//console.log(stateBefore, state);
+			if (state != stateBefore) {
+				helper.setAnimations(mesh);
+				mesh.mixer.stopAllAction();	// これが絶対必要!!!
+				if (state == "stop") {		// run → stop
+					console.log("stopped!!")
+					clip = mesh.geometry.animations[2];
+					action = mesh.mixer.clipAction(clip);
+					action.repetitions = 0;
+					action.play();
+					clip = mesh.geometry.animations[3];
+					action = mesh.mixer.clipAction(clip);
+					action.play();
+				}
+				else if (state == "running") {	// stop → run
+					console.log("start running!!")
+					clip = mesh.geometry.animations[0];
+					action = mesh.mixer.clipAction(clip);
+					action.repetitions = 0;
+					action.play();
+					clip = mesh.geometry.animations[1];
+					action = mesh.mixer.clipAction(clip);
+					action.repetitions = 'Infinity';
+					action.play();
+				}
+			}
+			stateBefore = state;
+		}
+
+		function render() {
+
+			camera.lookAt(scene.position);
+
+			if (mesh) {
+
+				helper.animate(clock.getDelta());
+				helper.render(scene, camera);
+
+			}
+
+		}
+
+	</script>
+</body>
+
+</html>
