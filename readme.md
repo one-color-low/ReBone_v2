@@ -56,4 +56,4 @@ room_name | model_path | background_path | sound_path | vmd_path |  subtitle_pat
 - 編集画面のパスコード
 - vmd直接アップロード
 - 動画アップロード
-- デプロイ
+- デプロイ# ReBone_v2
