@@ -9,8 +9,8 @@ from rebone_vmdl.applications import vmdlifting
  
 app = Flask(__name__)
 
-app.config['UPLOAD_FOLDER'] = os.path.abspath(__file__)+'/uploads'
-app.config['STATIC_FOLDER'] = os.path.abspath(__file__)+'/static'
+app.config['UPLOAD_FOLDER'] = os.path.dirname(os.path.abspath(__file__))+'/uploads'
+app.config['STATIC_FOLDER'] = os.path.dirname(os.path.abspath(__file__))+'/static'
 
 # ツール
 
@@ -144,7 +144,7 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
         ### input: fps30_mp4_path, output: vmd_path
         #vmd_path = '/unko'  # ダミー
         vmd_path = app.config['STATIC_FOLDER']+'/vmds/'+request.args.get('room_name','')+'.vmd'
-        vmdlifting.vmdlifting(mp4_path,  vmd_path)
+        vmdlifting.vmdlifting(fps30_mp4_path,  vmd_path)
 
 
         # 音声変換処理で返ってきたパス(processed_wav_path)と
