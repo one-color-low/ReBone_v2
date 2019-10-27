@@ -22,7 +22,7 @@ RUN cd /
 RUN curl -L -O https://github.com/one-color-low/ReBone_v2/archive/master.zip
 RUN unzip master.zip && rm master.zip
 RUN mv ReBone_v2-master ReBone_v2 && cd ReBone_v2
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r /ReBone_v2/requirements.txt
 
 CMD ["bash"]
 
