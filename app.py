@@ -219,6 +219,6 @@ def update_entry(room_name, model_path, background_path, sound_path, vmd_path, s
 
 # 実行
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
 # ※entry=一連の処理
