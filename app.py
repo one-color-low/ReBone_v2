@@ -108,7 +108,7 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
 
         # パスを設定(このパスだけは下階層のモジュールからも参照するので絶対パス))
         webm_path = app.config['UPLOAD_FOLDER']+'/video.webm'
-        mp4_path = app.config['UPLOAD_FOLDER']+'./video.mp4'
+        mp4_path = app.config['UPLOAD_FOLDER']+'/video.mp4'
         wav_path = app.config['UPLOAD_FOLDER']+'/audio.wav'
         fps30_mp4_path = app.config['UPLOAD_FOLDER']+'/video_30fps.mp4'
  
