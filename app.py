@@ -5,8 +5,9 @@ import ffmpeg
 import time
 from moviepy.editor import *
 from rebone_VC import VoiceConverter
-from rebone_vmdl.applications import vmdlifting 
- 
+from rebone_vmdl.applications import vmdlifting
+import librosa
+
 app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER'] = os.path.dirname(os.path.abspath(__file__))+'/uploads'
@@ -137,7 +138,9 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
         ## 音声変換
         ### input: wav_path, output: processed_wav_path
         processed_wav_path = 'static/voices/audio.wav'  # ダミー
-        vc_result = VoiceConverter.convert_voice(wav_path)
+        wav, _ = librosa.load(wav_path)
+        vc_result = VoiceConverter.convert_voice(wav)
+        librosa.output.write_wav(processed_wav_path, vc_result, sr=22050)
         print(vc_result)
 
         ## 動画変換
