@@ -78,7 +78,7 @@
                 var formData = new FormData()
                 formData.append('video_blob', video_blob, 'video.webm')
 
-                result_text.innerHTML("只今サーバーでモーション＆音声を作成しています。しばらくお待ちください...")
+                result_text.innerText = "只今サーバーでモーション＆音声を作成しています。しばらくお待ちください..."
 
                 // Ajaxでblobを送信
                 var xhr = new XMLHttpRequest()
@@ -87,7 +87,7 @@
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
                             console.log(xhr.responseText);
-                            result_text.innerHTML("モーション＆音声の作成が完了しました！次に進んでください。")
+                            result_text.innerText = "モーション＆音声の作成が完了しました！次に進んでください。"
                         } else {
                             console.error(xhr.statusText);
                         }
