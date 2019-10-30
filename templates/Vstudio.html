@@ -8,6 +8,11 @@
 
 <body>
 
+    <video id="video" width="640" height="480" autoplay></video>
+    <video id="result_video" width="640" height="480" autoplay></video>
+    <button id="record_btn">Record</button>
+    <div id="result_text"></div>
+
     <form method="POST">
         <p>BGMを選択</p>
         <select name="sound">
@@ -17,20 +22,15 @@
             <option value="green">草原っぽく</option>
         </select>
         <br>
-        <p>VMDファイルを選択</p>
+        <!--<p>VMDファイルを選択</p>
         <select name="vmd">
             <option value="wait">待機</option>
             <option value="bleath">呼吸</option>
             <option value="wavefile">ダンス(wavefile)</option>
         </select>
-        <br>
+        <br>-->
         <p><input type="submit" name="save" value="送信" /></p>
     </form>
-
-    <video id="video" width="640" height="480" autoplay></video>
-    <video id="result_video" width="640" height="480" autoplay></video>
-    <button id="record_btn">Record</button>
-    <div id="result"></div>
 
     <script>
 
@@ -41,7 +41,7 @@
             video: { width: 128, height: 72 },
             audio: true,
         })
-
+        var result_text = document.getElementById("result_text")
 
         //リアルタイムに再生（ストリーミング）させるためにビデオタグに流し込む
         media.then((stream) => {
@@ -78,9 +78,24 @@
                 var formData = new FormData()
                 formData.append('video_blob', video_blob, 'video.webm')
 
+                result_text.innerText = "只今サーバーでモーション＆音声を作成しています。しばらくお待ちください..."
+
                 // Ajaxでblobを送信
                 var xhr = new XMLHttpRequest()
-                xhr.open('POST', '/makevmd?room_name='+'{{ room_name }}')
+                xhr.open('POST', '/makevmd?room_name=' + '{{ room_name }}')
+                xhr.onload = function (e) {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            console.log(xhr.responseText);
+                            result_text.innerText = "モーション＆音声の作成が完了しました！次に進んでください。"
+                        } else {
+                            console.error(xhr.statusText);
+                        }
+                    }
+                };
+                xhr.onerror = function (e) {
+                    console.error(xhr.statusText);
+                };
                 xhr.send(formData)
 
             }
