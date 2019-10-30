@@ -1,5 +1,5 @@
 # Description
-簡単に美少女に生まれ変われるアプリ「ReBorn」をデプロイするためのリポジトリです。
+簡単に美少女に生まれ変われるアプリ「ReBorn」をビルドするためのリポジトリです。
 
 # Requirement
 Dockerfileを参照
