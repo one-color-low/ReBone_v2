@@ -7,7 +7,7 @@ from .speech_tools import *
 src_speaker = 'my_voice'
 trg_speaker = 'natori'
 model_name = 'cyclegan_vc2'
-pretrain_dir = 'pretrain_data'
+pretrain_dir = os.path.dirname(os.path.abspath(__file__))+'/pretrain_data'
 
 def convert_voice(wav, sampling_rate=22050, num_mcep=36, frame_period=5.0, n_frames=128):
     print('Loading cached data...')
