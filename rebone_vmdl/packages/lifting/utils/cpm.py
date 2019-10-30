@@ -3,7 +3,7 @@ TODO: Almost all variables in this file violate PEP 8 naming conventions
 """
 
 import tensorflow as tf
-#import tensorflow.contrib.layers as layers
+import tensorflow.contrib.layers as layers
 
 __all__ = [
     'inference_person',
