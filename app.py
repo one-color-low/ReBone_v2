@@ -73,7 +73,7 @@ def Vstudio():
                 model_path = None,
                 background_path = None,
                 sound_path = get_path('sound', request.form['sound']), 
-                vmd_path = get_path('vmd', request.form['vmd']),
+                vmd_path = None,
                 subtitle_path = get_path('subtitle', 'sample'),
                 voice_path = None ) 
             next_url = url_for('Vroom',room_name=request.args.get('room_name'))
