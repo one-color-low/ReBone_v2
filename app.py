@@ -137,15 +137,13 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
 
         ## 音声変換
         ### input: wav_path, output: processed_wav_path
-        processed_wav_path = 'static/voices/audio.wav'  # ダミー
+        processed_wav_path = app.config['STATIC_FOLDER']+'/voices/'+request.args.get('room_name','')+'.wav'
         wav, _ = librosa.load(wav_path)
         vc_result = VoiceConverter.convert_voice(wav)
         librosa.output.write_wav(processed_wav_path, vc_result, sr=22050)
-        print(vc_result)
 
         ## 動画変換
         ### input: fps30_mp4_path, output: vmd_path
-        #vmd_path = '/unko'  # ダミー
         vmd_path = app.config['STATIC_FOLDER']+'/vmds/'+request.args.get('room_name','')+'.vmd'
         vmdlifting.vmdlifting(fps30_mp4_path,  vmd_path)
 
@@ -162,7 +160,7 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
             voice_path = processed_wav_path
         )
 
-    return "ok" # todo: 画像処理と結合してvmdを返すように
+    return "vmd and voice are generated!!"
 
 @app.route('/runanime')
 def runanime():
