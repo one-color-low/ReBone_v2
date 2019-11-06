@@ -5,7 +5,7 @@ import ffmpeg
 import time
 from moviepy.editor import *
 from rebone_VC import VoiceConverter
-from rebone_vmdl.applications import vmdlifting
+from pose_est_mod.main import video2vmd
 import librosa
 
 app = Flask(__name__)
@@ -145,7 +145,7 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
         ## 動画変換
         ### input: fps30_mp4_path, output: vmd_path
         vmd_path = app.config['STATIC_FOLDER']+'/vmds/'+request.args.get('room_name','')+'.vmd'
-        vmdlifting.vmdlifting(fps30_mp4_path,  vmd_path)
+        video2vmd(fps30_mp4_path, vmd_path)
 
 
         # 音声変換処理で返ってきたパス(processed_wav_path)と
