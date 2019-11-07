@@ -8,9 +8,19 @@
 
 <body>
 
+    <p>「録画開始」ボタンで動画の撮影を開始するか、フォームからmp4動画をアップロードしてください</p>
+
+    <button id="record_btn">録画開始</button>
+    <br>
+    <form id="movie_upload">
+        <p>mp4動画をアップロード</p>
+        <p><input type="file" id="video_upload" name="movie"></p>
+        <button type="button" onclick="file_upload()">アップロード</button>
+    </form>
+
     <video id="video" width="640" height="480" autoplay></video>
     <video id="result_video" width="640" height="480" autoplay></video>
-    <button id="record_btn">Record</button>
+
     <div id="result_text"></div>
 
     <form method="POST">
@@ -29,7 +39,7 @@
             <option value="wavefile">ダンス(wavefile)</option>
         </select>-->
         <br>
-        <p><input type="submit" name="save" value="送信" /></p>
+        <p><input type="submit" id="submit_all" name="save" value="送信" disabled="disabled"/></p>
     </form>
 
     <script>
@@ -42,7 +52,7 @@
             audio: true,
         })
         var result_text = document.getElementById("result_text")
-        var submit_btn = document.getElementsByTagName("input")
+        var submit_btn = document.getElementById("submit_all")
         submit_btn.disabled = true;
 
         //リアルタイムに再生（ストリーミング）させるためにビデオタグに流し込む
@@ -78,11 +88,12 @@
                 result_video.play()
 
                 var formData = new FormData()
+                formData.append('type', 'recorded')
                 formData.append('video_blob', video_blob, 'video.webm')
 
                 result_text.innerText = "只今サーバーでモーション＆音声を作成しています。しばらくお待ちください..."
 
-                // Ajaxでblobを送信
+                // xhrでblobを送信
                 var xhr = new XMLHttpRequest()
                 xhr.open('POST', '/makevmd?room_name=' + '{{ room_name }}')
                 xhr.onload = function (e) {
@@ -104,6 +115,31 @@
             }
         });
 
+        function file_upload() {
+            // フォームデータを取得
+            var formData = new FormData();
+            formData.append('type', 'uploaded')
+            formData.append('video_mp4', document.getElementById("video_upload").files[0])
+
+            result_text.innerText = "只今サーバーでモーション＆音声を作成しています。しばらくお待ちください..."
+
+            // xhrで添付動画アップロード
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/makevmd?room_name=' + '{{ room_name }}')
+            xhr.onreadystatechange = function () {
+                if (xhr.status == 200) {
+                    console.log(xhr.responseText);
+                    result_text.innerText = "モーション＆音声の作成が完了しました！次に進んでください。"
+                    submit_btn.disabled = false;
+                } else {
+                    console.error(xhr.statusText);
+                }
+            };
+            xhr.onerror = function (e) {
+                console.error(xhr.statusText);
+            };
+            xhr.send(formData);
+        }
 
     </script>
 

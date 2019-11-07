@@ -103,30 +103,52 @@ def Vroom():
 @app.route('/makevmd', methods=['POST', 'GET'])
 def makevmd():  # todo: できれば名前変えたい(音声変換もするので)
     if request.method == 'POST':
-        video_file = request.files['video_blob']
-        video_file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'video.webm'))
+        # 撮影した場合
+        if request.form['type'] == 'recorded':
+            video_file = request.files['video_blob']
+            video_file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'video.webm'))
+        # mp4アップロードした場合
+        elif request.form['type'] == 'uploaded':
+            video_file = request.files['video_mp4']
+            video_file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'upload_video.mp4'))
         time.sleep(1)   # 保存処理に時間がかかるので少し待つ
 
         # パスを設定(このパスだけは下階層のモジュールからも参照するので絶対パス))
         webm_path = app.config['UPLOAD_FOLDER']+'/video.webm'
+        upload_mp4_path = app.config['UPLOAD_FOLDER']+'/upload_video.mp4'
         mp4_path = app.config['UPLOAD_FOLDER']+'/video.mp4'
         wav_path = app.config['UPLOAD_FOLDER']+'/audio.wav'
         fps30_mp4_path = app.config['UPLOAD_FOLDER']+'/video_30fps.mp4'
- 
-        # webm -> mp4 ＆ wavに変換して保存
-        (
-            ffmpeg
-            .input(webm_path)
-            .output(mp4_path, vcodec='h264')
-            .run(overwrite_output=True)
-        )
 
-        (
-            ffmpeg
-            .input(webm_path)
-            .output(wav_path, acodec='pcm_s16le')
-            .run(overwrite_output=True)
-        )
+        # 撮影した場合
+        if request.form['type'] == 'recorded':
+            # webm -> mp4 ＆ wavに変換して保存
+            (
+                ffmpeg
+                .input(webm_path)
+                .output(mp4_path, vcodec='h264')
+                .run(overwrite_output=True)
+            )
+
+            (
+                ffmpeg
+                .input(webm_path)
+                .output(wav_path, acodec='pcm_s16le')
+                .run(overwrite_output=True)
+            )
+
+        # mp4アップロードした場合
+        elif request.form['type'] == 'uploaded':
+            # mp4はそのまま ＆ wavに変換
+            mp4_path = upload_mp4_path
+
+            (
+                ffmpeg
+                .input(upload_mp4_path)
+                .output(wav_path, acodec='pcm_s16le')
+                .run(overwrite_output=True)
+            )
+
 
         # mp4をfps30にして保存
         clip = VideoFileClip(mp4_path)
