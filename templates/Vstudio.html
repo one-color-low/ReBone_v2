@@ -13,7 +13,7 @@
     <button id="record_btn">Record</button>
     <div id="result_text"></div>
 
-    <!--<form method="POST">
+    <form method="POST">
         <p>BGMを選択</p>
         <select name="sound">
             <option value="edm_1">EDM その１</option>
@@ -22,15 +22,15 @@
             <option value="green">草原っぽく</option>
         </select>
         <br>
-        <p>VMDファイルを選択</p>
+        <!--<p>VMDファイルを選択</p>
         <select name="vmd">
             <option value="wait">待機</option>
             <option value="bleath">呼吸</option>
             <option value="wavefile">ダンス(wavefile)</option>
-        </select>
+        </select>-->
         <br>
         <p><input type="submit" name="save" value="送信" /></p>
-    </form>-->
+    </form>
 
     <script>
 
@@ -42,6 +42,8 @@
             audio: true,
         })
         var result_text = document.getElementById("result_text")
+        var submit_btn = document.getElementsByTagName("input")
+        submit_btn.disabled = true;
 
         //リアルタイムに再生（ストリーミング）させるためにビデオタグに流し込む
         media.then((stream) => {
@@ -88,6 +90,7 @@
                         if (xhr.status === 200) {
                             console.log(xhr.responseText);
                             result_text.innerText = "モーション＆音声の作成が完了しました！次に進んでください。"
+                            submit_btn.disabled = false;
                         } else {
                             console.error(xhr.statusText);
                         }
