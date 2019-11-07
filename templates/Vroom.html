@@ -36,8 +36,8 @@
         var vmdFiles = ['../' + '{{ vmd_path }}'];
         //var vmdFiles = '../static/vmds/test.vmd'; // liftingのサンプル
         var audioFile = '../' + '{{ sound_path }}';
-        var voiceFile = '../' + '{{ voice_path }}' ;
-        var audioParams = { delayTime: - 1.2};
+        var voiceFile = '../' + '{{ voice_path }}';
+        var audioParams = { delayTime: - 1.2 };
 
         Ammo().then(function (AmmoLib) {
 
@@ -124,28 +124,17 @@
 
             var loader = new MMDLoader();
 
-            new THREE.AudioLoader().load(voiceFile, function (buffer) {
-                var listener = new THREE.AudioListener();
-                var voice = new THREE.Audio(listener).setBuffer(buffer);
-                listener.position.z = 1;
-                helper.add(voice, audioParams);
-                scene.add(voice);
-                scene.add(listener);
-                ready = true;
-            }, onProgress, null);
-
             loader.loadWithAnimation(modelFile, vmdFiles, function (mmd) {
 
                 mesh = mmd.mesh;
                 mesh.position.y = - 10;
-                scene.add(mesh);
 
                 helper.add(mesh, {
                     animation: mmd.animation,
                     physics: false
                 });
 
-                ikHelper = helper.objects.get(mesh).ikSolver.createHelper();
+                /*ikHelper = helper.objects.get(mesh).ikSolver.createHelper();
                 ikHelper.visible = false;
                 scene.add(ikHelper);
 
@@ -153,7 +142,19 @@
                 physicsHelper.visible = false;
                 scene.add(physicsHelper);
 
-                initGui();
+                initGui();*/
+
+                new THREE.AudioLoader().load(voiceFile, function (buffer) {
+                    var listener = new THREE.AudioListener();
+                    var voice = new THREE.Audio(listener).setBuffer(buffer);
+                    listener.position.z = 1;
+                    helper.add(voice, audioParams);
+                    scene.add(voice);
+                    scene.add(listener);
+                    ready = true;
+                }, onProgress, null);
+
+                scene.add(mesh);
 
             }, onProgress, null);
 
