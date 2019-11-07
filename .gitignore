@@ -2,3 +2,4 @@ vvenv/
 __pycache__/
 .vscode/
 *.mp4
+pose_est_mod/

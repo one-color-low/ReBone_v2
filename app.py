@@ -5,7 +5,7 @@ import ffmpeg
 import time
 from moviepy.editor import *
 from rebone_VC import VoiceConverter
-from pose_est_mod.main import video2vmd
+from pose_est_mod.pem import video2vmd
 import librosa
 
 app = Flask(__name__)

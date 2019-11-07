@@ -7,9 +7,10 @@ ENV LANG=C.UTF-8
 
 # install packages
 ## Preperation
-RUN apt-get update -y --fix-missing
+RUN apt-get update -y
 RUN apt-get install -y apt-utils
 RUN apt-get install -y python3-pip
+RUN apt-get install software-properties-common -y
 
 ## for ffmpeg
 RUN add-apt-repository ppa:jonathonf/ffmpeg-3
@@ -64,38 +65,42 @@ RUN pip3 install slidingwindow
 RUN pip3 install tqdm
 RUN pip3 install git+https://github.com/ppwwyyxx/tensorpack.git
 
-
 ## for vc
 RUN pip3 install librosa
 RUN pip3 install pyworld
-
 
 ## for app
 RUN pip3 install flask
 RUN pip3 install flask_sqlalchemy
 RUN pip3 install moviepy
 
-# ---for deploy---
-#RUN curl -L -O https://github.com/one-color-low/ReBone_v2/archive/fix-for-exact-deploy.zip
+
+# setups
+
+## ---for deploy---
+### アプリ本体
+#RUN curl -L -O https://github.com/one-color-low/ReBone_v2/archive/master.zip
 #RUN unzip master.zip && rm master.zip
-#RUN unzip fix-for-exact-deploy.zip && rm fix-for-exact-deploy.zip
+#RUN mv ReBone_v2-master ReBone_v2
 
-#RUN mv ReBone_v2-fix-for-exact-deploy ReBone_v2
+### PE用のモジュールを用意(てきとー)
+#RUN curl https://drive.google.com/file/d/1WftNAXfy3scAKT2yNCl5eUQINnjbIh8n/view
+#RUN unzip pose_est_mod.zip && rm pose_est_mod.zip
+#RUN mv pose_est_mod rebone_v2/
+#RUN mv pose_est_mod_pre/pem.py rebone_v2/pose_est_mod/
 
-## setups
+### VC用の学習モデルを用意
 #RUN /ReBone_v2/rebone_VC/setup.sh
 #RUN unzip pretrain_data.zip && rm pretrain_data.zip
-#RUN chmod +x /ReBone_v2/rebone_vmdl/setup.sh
-#RUN /ReBone_v2/rebone_vmdl/setup.sh
+#RUN mv pretrain_data rebone_v2/rebone_VC/
 
-# ---for local build---
+## ---for local build---
 RUN mkdir ReBone_v2
 COPY ./ /ReBone_v2
 
-## setups
-RUN chmod +x /ReBone_v2/rebone_vmdl/setup.sh
-RUN /ReBone_v2/rebone_vmdl/setup.sh
-RUN mv /data /ReBone_v2/rebone_vmdl
+RUN cd /pose_est_mod/tf_pose_estimation/tf_pose/pafprocess \
+ && swig -python -c++ pafprocess.i \
+ && python3 setup.py build_ext --inplace
 
 CMD ["bash"]
 
