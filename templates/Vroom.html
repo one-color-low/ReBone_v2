@@ -30,14 +30,14 @@
 
         var clock = new THREE.Clock();
 
+        // xxx_pathは絶対パスでも'static/...'でも、どちらでも可
         var backgroundFile = '../' + '{{ background_path }}';
         var modelFile = '../' + '{{ model_path }}';
         var vmdFiles = ['../' + '{{ vmd_path }}'];
         //var vmdFiles = '../static/vmds/test.vmd'; // liftingのサンプル
         var audioFile = '../' + '{{ sound_path }}';
-        console.log(audioFile)
         var voiceFile = '../' + '{{ voice_path }}' ;
-        var audioParams = { delayTime: 160 * 1 / 30 };
+        var audioParams = { delayTime: - 1.2};
 
         Ammo().then(function (AmmoLib) {
 
