@@ -20,8 +20,10 @@ RUN apt install -y ffmpeg libav-tools x264 x265
 ## for pose_set_mod
 RUN apt-get install -y curl unzip lv
 RUN apt-get install -y libsm6 libgl1 libxrender1
-RUN pip uninstall tensorflow
-RUN pip install tensorflow==1.8.0
+
+# gpuにする場合は以下をコメントアウト
+#RUN pip uninstall tensorflow
+#RUN pip install tensorflow==1.8.0
 
 ## others
 RUN apt-get install -y git
@@ -98,9 +100,13 @@ RUN pip3 install moviepy
 RUN mkdir ReBone_v2
 COPY ./ /ReBone_v2
 
-RUN cd /pose_est_mod/tf_pose_estimation/tf_pose/pafprocess \
- && swig -python -c++ pafprocess.i \
- && python3 setup.py build_ext --inplace
+COPY test_raw.vmd ReBone_v2/
+
+WORKDIR /ReBone_v2/pose_est_mod/tf_pose_estimation/tf_pose/pafprocess
+RUN swig -python -c++ pafprocess.i
+RUN python3 setup.py build_ext --inplace
+
+WORKDIR /ReBone_v2
 
 CMD ["bash"]
 

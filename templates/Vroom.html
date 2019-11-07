@@ -129,6 +129,7 @@
                 var voice = new THREE.Audio(listener).setBuffer(buffer);
                 listener.position.z = 1;
                 helper.add(voice, audioParams);
+
                 scene.add(voice);
                 scene.add(listener);
                 ready = true;
