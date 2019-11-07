@@ -3,3 +3,4 @@ __pycache__/
 .vscode/
 *.mp4
 pose_est_mod/
+rebone_VC/pretrain_data/
