@@ -9,7 +9,7 @@ from rebone_vmdl.applications import vmdlifting
 import librosa
 from pose_est_mod.pem import video2vmd
 import tensorflow as tf
-from noise_reduction.Noise_Reduction import reduction
+from noise_reduction.NoiseReduction_filters import main_reduction, main_lowpass
 
 app = Flask(__name__)
 
@@ -34,7 +34,7 @@ def get_path(type, name):
     elif type == "subtitle":
         return 'static/subtitles/'+name+'.json'
 
-def is_valid(room_name):    
+def is_valid(room_name):
     table = Entry.query.all()
     for row in table:
         if row.room_name == room_name:
@@ -164,11 +164,12 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
         ### input: wav_path, output: processed_wav_path
         processed_wav_path = app.config['STATIC_FOLDER']+'/voices/'+request.args.get('room_name','')+'.wav'
         processed_wav_path_filtered = app.config['STATIC_FOLDER']+'/voices/'+request.args.get('room_name','')+'_filtered'+'.wav'
+        main_reduction(wav_path, wav_path)
         wav, _ = librosa.load(wav_path)
         vc_result = VoiceConverter.convert_voice(wav)
         librosa.output.write_wav(processed_wav_path, vc_result, sr=22050)
         tf.contrib.keras.backend.clear_session()
-        reduction(processed_wav_path, processed_wav_path_filtered)
+        main_lowpass(processed_wav_path, processed_wav_path_filtered)
 
         ## 動画変換
         ### input: fps30_mp4_path, output: vmd_path
