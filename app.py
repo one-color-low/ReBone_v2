@@ -9,6 +9,7 @@ from rebone_vmdl.applications import vmdlifting
 import librosa
 from pose_est_mod.pem import video2vmd
 import tensorflow as tf
+from noise_reduction.Noise_Reduction import reduction
 
 app = Flask(__name__)
 
@@ -162,10 +163,12 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
         ## 音声変換
         ### input: wav_path, output: processed_wav_path
         processed_wav_path = app.config['STATIC_FOLDER']+'/voices/'+request.args.get('room_name','')+'.wav'
+        processed_wav_path_filtered = app.config['STATIC_FOLDER']+'/voices/'+request.args.get('room_name','')+'_filtered'+'.wav'
         wav, _ = librosa.load(wav_path)
         vc_result = VoiceConverter.convert_voice(wav)
         librosa.output.write_wav(processed_wav_path, vc_result, sr=22050)
         tf.contrib.keras.backend.clear_session()
+        reduction(processed_wav_path, processed_wav_path_filtered)
 
         ## 動画変換
         ### input: fps30_mp4_path, output: vmd_path
