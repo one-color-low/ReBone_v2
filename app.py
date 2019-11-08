@@ -121,6 +121,7 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
         upload_mp4_path = app.config['UPLOAD_FOLDER']+'/upload_video.mp4'
         mp4_path = app.config['UPLOAD_FOLDER']+'/video.mp4'
         wav_path = app.config['UPLOAD_FOLDER']+'/audio.wav'
+        wav_path_filtered = app.config['UPLOAD_FOLDER']+'/audio_filtered.wav'
         fps30_mp4_path = app.config['UPLOAD_FOLDER']+'/video_30fps.mp4'
 
         # 撮影した場合
@@ -164,11 +165,14 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
         ### input: wav_path, output: processed_wav_path
         processed_wav_path = app.config['STATIC_FOLDER']+'/voices/'+request.args.get('room_name','')+'.wav'
         processed_wav_path_filtered = app.config['STATIC_FOLDER']+'/voices/'+request.args.get('room_name','')+'_filtered'+'.wav'
-        main_reduction(wav_path, wav_path)
-        wav, _ = librosa.load(wav_path)
+
+        #main_reduction(wav_path, wav_path_filtered)
+
+        wav, _ = librosa.load(wav_path, sr=22050)
         vc_result = VoiceConverter.convert_voice(wav)
         librosa.output.write_wav(processed_wav_path, vc_result, sr=22050)
         tf.contrib.keras.backend.clear_session()
+
         main_lowpass(processed_wav_path, processed_wav_path_filtered)
 
         ## 動画変換

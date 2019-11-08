@@ -4,6 +4,7 @@ import scipy
 from scipy import signal
 import math
 import cmath
+import librosa
 
 #調整パラメータ
 # amp_max_smooth_filterのパラメータ
@@ -18,11 +19,13 @@ fc=7500
 
 
 def load_wav(input_path):
-    data, sampleRate = lc.load(input_path, sr=44100, duration=10, mono=True)
+    data, sampleRate = librosa.load(input_path, sr=22050, duration=10, mono=True)
     return data,sampleRate
 
 def save_wav(data,output_path):
-    scipy.io.wavfile.write(output_path, 44100, data) 
+    data=data.astype(np.float32)
+    # librosa.output.write_wav(output_path,data,sr=22050)
+    scipy.io.wavfile.write(output_path,22050,data)
 
 # 短区間フーリエ変換
 def STFT(data,sampleRate):
