@@ -4,3 +4,4 @@ __pycache__/
 *.mp4
 rebone_VC/pretrain_data/
 pose_est_mod/d3_pose_baseline_vmd/experiments/
+data/
