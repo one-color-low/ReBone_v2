@@ -6,4 +6,6 @@ __pycache__/
 *.wav
 rebone_VC/pretrain_data/
 pose_est_mod/d3_pose_baseline_vmd/experiments/
-data/
+pose_est_mod/d3_pose_baseline_vmd/data/
+pose_est_mod/FCRN_DepthPrediction_vmd/data/
+pose_est_mod/VMD_3d_pose_baseline_multi/data/
