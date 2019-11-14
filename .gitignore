@@ -2,6 +2,8 @@ vvenv/
 __pycache__/
 .vscode/
 *.mp4
+*.webm
+*.wav
 rebone_VC/pretrain_data/
 pose_est_mod/d3_pose_baseline_vmd/experiments/
 data/
