@@ -14,6 +14,7 @@ from .common import CocoPart
 from .tensblur.smoother import Smoother
 
 _tf_pose_estimator_tensorrt_disabled=False
+# gpu版の場合は以下のコメントアウトを外す
 '''try:
     #import tensorflow.contrib.tensorrt as trt
 except ModuleNotFoundError:
