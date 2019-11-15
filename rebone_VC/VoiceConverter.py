@@ -1,23 +1,24 @@
 import os
-from os.path import join
+from os.path import join, dirname, abspath
+import tensorflow as tf
+from tensorflow import gfile
 
-from .models.cyclegan_vc import CycleGAN
 from .speech_tools import *
 
+now_dir = abspath(dirname(__file__))
 src_speaker = 'my_voice'
 trg_speaker = 'natori'
 model_name = 'cyclegan_vc2'
 pretrain_dir = os.path.dirname(os.path.abspath(__file__))+'/pretrain_data'
+num_mcep=36
 
-def convert_voice(wav, sampling_rate=22050, num_mcep=36, frame_period=5.0, n_frames=128):
-    print('Loading cached data...')
-    coded_sps_A_norm, coded_sps_A_mean, coded_sps_A_std, log_f0s_mean_A, log_f0s_std_A \
-    = load_pickle(join(pretrain_dir, 'cache', '{}{}.p'.format(src_speaker, num_mcep)))
-    coded_sps_B_norm, coded_sps_B_mean, coded_sps_B_std, log_f0s_mean_B, log_f0s_std_B \
-    = load_pickle(join(pretrain_dir, 'cache', '{}{}.p'.format(trg_speaker, num_mcep)))
+print('Loading cached data...')
+coded_sps_A_norm, coded_sps_A_mean, coded_sps_A_std, log_f0s_mean_A, log_f0s_std_A \
+= load_pickle(join(now_dir, pretrain_dir, 'cache', '{}{}.p'.format(src_speaker, num_mcep)))
+coded_sps_B_norm, coded_sps_B_mean, coded_sps_B_std, log_f0s_mean_B, log_f0s_std_B \
+= load_pickle(join(now_dir, pretrain_dir, 'cache', '{}{}.p'.format(trg_speaker, num_mcep)))
 
-    model = CycleGAN(num_features=num_mcep, batch_size=1, mode='test')
-    model.load(join(pretrain_dir, '{}_100000.ckpt'.format(model_name)))
+def convert_voice(wav, sampling_rate=22050, frame_period=5.0, n_frames=128):
 
     print('Generating Validation Data B from A...')
     wav = wav_padding(wav=wav, sr=sampling_rate, frame_period=frame_period, multiple=4)
@@ -27,7 +28,14 @@ def convert_voice(wav, sampling_rate=22050, num_mcep=36, frame_period=5.0, n_fra
     coded_sp = world_encode_spectral_envelop(sp=sp, fs=sampling_rate, dim=num_mcep)
     coded_sp_transposed = coded_sp.T
     coded_sp_norm = (coded_sp_transposed - coded_sps_A_mean) / coded_sps_A_std
-    coded_sp_converted_norm = model.test(inputs=np.array([coded_sp_norm]), direction='A2B')[0]
+
+    with tf.Session() as sess:
+        with gfile.FastGFile(join(pretrain_dir,"graph.pb"), 'rb') as f:
+            graph_def = tf.GraphDef()
+            graph_def.ParseFromString(f.read())
+            _ = tf.import_graph_def(graph_def, name = '')
+            coded_sp_converted_norm = sess.run('generator_A2B/out_squeeze:0', feed_dict = {'input_A_real:0': np.array([coded_sp_norm])})[0]
+
     if coded_sp_converted_norm.shape[1] > len(f0):
         coded_sp_converted_norm = coded_sp_converted_norm[:, :-1]
     coded_sp_converted = coded_sp_converted_norm * coded_sps_B_std + coded_sps_B_mean
