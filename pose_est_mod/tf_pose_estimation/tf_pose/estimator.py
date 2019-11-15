@@ -14,11 +14,11 @@ from .common import CocoPart
 from .tensblur.smoother import Smoother
 
 _tf_pose_estimator_tensorrt_disabled=False
-try:
-    import tensorflow.contrib.tensorrt as trt
+'''try:
+    #import tensorflow.contrib.tensorrt as trt
 except ModuleNotFoundError:
     _tf_pose_estimator_tensorrt_disabled=True
-
+'''
 try:
     from .pafprocess import pafprocess
 except ModuleNotFoundError as e:

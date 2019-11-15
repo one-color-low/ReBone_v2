@@ -1,4 +1,5 @@
-FROM nvcr.io/nvidia/tensorflow:18.07-py3
+#FROM nvcr.io/nvidia/tensorflow:18.07-py3
+FROM ubuntu:16.04
 
 WORKDIR /
 ENV DEBIAN_FRONTEND=noninteractive
@@ -23,7 +24,7 @@ RUN apt-get install -y libsm6 libgl1 libxrender1
 
 # gpuにする場合は以下をコメントアウト
 #RUN pip uninstall tensorflow
-#RUN pip install tensorflow==1.8.0
+RUN pip3 install tensorflow==1.8.0
 
 ## others
 RUN apt-get install -y git
@@ -65,7 +66,7 @@ RUN pip3 install scikit-image
 RUN pip3 install scipy
 RUN pip3 install slidingwindow
 RUN pip3 install tqdm
-RUN pip3 install git+https://github.com/ppwwyyxx/tensorpack.git
+#RUN pip3 install git+https://github.com/ppwwyyxx/tensorpack.git
 
 ## for vc
 RUN pip3 install librosa
