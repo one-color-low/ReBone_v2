@@ -23,17 +23,20 @@ fps_time = 0
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
+tensorrt = "false"
+
+model = "mobilenet_v2_large"
+logger.debug('initialization %s : %s' % (model, get_graph_path(model)))
+w, h = model_wh('432x368')
+e = TfPoseEstimator(get_graph_path(model), target_size=(w, h), trt_bool=str2bool(tensorrt))
+
+
 def pose_estimation(input_video_path, output_json_dir, number_people_max=1, frame_first=0):
     #parser.add_argument('--model', type=str, default='mobilenet_thin', help='cmu / mobilenet_thin / mobilenet_v2_large / mobilenet_v2_small')
     #parser.add_argument('--show-process', action='store_true',
     #                    help='for debug purpose, if enabled, speed for inference is dropped.')
 
-    tensorrt = "false"
 
-    model = "mobilenet_v2_large"
-    logger.debug('initialization %s : %s' % (model, get_graph_path(model)))
-    w, h = model_wh('432x368')
-    e = TfPoseEstimator(get_graph_path(model), target_size=(w, h), trt_bool=str2bool(tensorrt))
     cap = cv2.VideoCapture(input_video_path)
 
     if cap.isOpened() is False:
