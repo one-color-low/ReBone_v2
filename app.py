@@ -171,7 +171,7 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
         wav, _ = librosa.load(wav_path, sr=22050)
         vc_result = VoiceConverter.convert_voice(wav)
         librosa.output.write_wav(processed_wav_path, vc_result, sr=22050)
-        tf.contrib.keras.backend.clear_session()
+
 
         main_lowpass(processed_wav_path, processed_wav_path_filtered)
 
@@ -179,7 +179,7 @@ def makevmd():  # todo: できれば名前変えたい(音声変換もするの�
         ### input: fps30_mp4_path, output: vmd_path
         vmd_path = app.config['STATIC_FOLDER']+'/vmds/'+request.args.get('room_name','')+'.vmd'
         video2vmd(fps30_mp4_path,  vmd_path)
-        tf.contrib.keras.backend.clear_session()
+
 
 
         # 音声変換処理で返ってきたパス(processed_wav_path)と
